@@ -345,23 +345,24 @@ input[type=range]{width:100%;accent-color:var(--bh-orange);height:32px}
 
   function go(i){ cur = Math.max(0, Math.min(STEPS.length - 1, i)); render(); window.scrollTo(0, 0); var h2 = card.querySelector('h2'); if (h2) { h2.setAttribute('tabindex', '-1'); h2.focus({preventScroll:true}); } }
 
+  var SUPABASE_URL = 'https://qajxcwbxqmnqgfqscviu.supabase.co';
+  var SUPABASE_KEY = 'sb_publishable_0zHd7uO8H6KjjcWdiCQcaQ_UvoxoTbI';
+
   function submit(){
     go(STEPS.length - 1);
     var note = document.getElementById('saveNote');
-    var payload = { org: org || '', answers: answers, submittedAt: new Date().toISOString(), version: 'test-1' };
-    var done = false;
-    function fallback(){ if (done) return; done = true; note.textContent = 'Je antwoorden staan klaar, maar konden in deze testomgeving niet centraal worden opgeslagen. Kopieer ze hieronder en stuur ze naar je Bikkelhart-contactpersoon.'; }
-    var timer = setTimeout(fallback, 12000);
+    var payload = { org: org || '', answers: answers, submitted_at: new Date().toISOString(), version: 'test-1' };
+    function fallback(){ note.textContent = 'Je antwoorden konden niet worden opgeslagen. Kopieer ze hieronder en stuur ze naar je Bikkelhart-contactpersoon.'; }
     try {
-      if (!window.claude || !window.claude.use) { clearTimeout(timer); fallback(); return; }
-      window.claude.use('db').then(function(db){
-        if (!db) { clearTimeout(timer); fallback(); return; }
-        return db.collection('responses').add(payload).then(function(){
-          clearTimeout(timer); if (done) return; done = true;
-          note.textContent = 'Je antwoorden zijn opgeslagen bij het Bikkelhart-team.';
-        });
-      }).catch(function(){ clearTimeout(timer); fallback(); });
-    } catch(e) { clearTimeout(timer); fallback(); }
+      fetch(SUPABASE_URL + '/rest/v1/responses', {
+        method: 'POST',
+        headers: { 'apikey': SUPABASE_KEY, 'Content-Type': 'application/json', 'Prefer': 'return=minimal' },
+        body: JSON.stringify(payload)
+      }).then(function(r){
+        if (!r.ok) throw new Error('HTTP ' + r.status);
+        note.textContent = 'Je antwoorden zijn opgeslagen bij het Bikkelhart-team.';
+      }).catch(function(e){ console.error(e); fallback(); });
+    } catch(e) { fallback(); }
   }
 
   render();
