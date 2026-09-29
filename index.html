@@ -1,0 +1,371 @@
+<!doctype html>
+<html lang="nl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Bikkelhart merkscan</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Poppins:wght@500;600;700&family=Karla:wght@400;500;700&family=Caveat:wght@600&display=swap">
+<style>
+:root{
+  --bh-blue:#081F2C; --bh-blue-mid:#1F3745; --bh-orange:#FE5000; --bh-orange-dark:#DD4600; --bh-orange-light:#FFEEE6;
+  --bh-sand:#F9F8F3; --bh-sand-dark:#E4E2DA; --bh-grey:#748289; --bh-line:#E8EAEB; --bh-accent:#009BD0;
+  --bg:var(--bh-sand); --surface:#FFFFFF; --text:var(--bh-blue); --text-2:#3E5360; --muted:#5E6E76; --line:#DCDCDC;
+  --hero:var(--bh-blue); --hero-text:#FFFFFF; --btn:var(--bh-blue); --btn-text:#FFFFFF; --chip:#FFFFFF; --chip-on:var(--bh-blue); --chip-on-text:#FFFFFF;
+  --shadow:0 4px 40px rgba(0,0,0,.10);
+  box-sizing:border-box; padding-top:env(safe-area-inset-top,0px); padding-bottom:env(safe-area-inset-bottom,0px);
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --bg:#06161F; --surface:#0F2835; --text:#F4F3EE; --text-2:#C9D1D5; --muted:#9FAEB5; --line:#2A4452;
+    --hero:#0B2330; --btn:#FE5000; --btn-text:#081F2C; --chip:#0F2835; --chip-on:#FE5000; --chip-on-text:#081F2C; --shadow:none; --bh-orange-light:#3A1E10;
+  }
+}
+:root[data-theme="dark"]{
+  --bg:#06161F; --surface:#0F2835; --text:#F4F3EE; --text-2:#C9D1D5; --muted:#9FAEB5; --line:#2A4452;
+  --hero:#0B2330; --btn:#FE5000; --btn-text:#081F2C; --chip:#0F2835; --chip-on:#FE5000; --chip-on-text:#081F2C; --shadow:none; --bh-orange-light:#3A1E10;
+}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--text);font-family:'Karla',system-ui,sans-serif;font-size:18px;line-height:1.65}
+h1,h2,h3{font-family:'Poppins','Open Sans',system-ui,sans-serif;font-weight:700;letter-spacing:-0.01em;text-wrap:balance;margin:0}
+.wrap{max-width:880px;margin:0 auto;padding:0 24px}
+header.top{position:sticky;top:env(safe-area-inset-top,0px);z-index:5;background:var(--bg);border-bottom:1px solid var(--line)}
+.topbar{display:flex;align-items:center;justify-content:space-between;gap:16px;height:72px}
+.logo{display:flex;align-items:center;gap:10px;text-decoration:none;color:var(--text)}
+.ruit{width:26px;height:26px;position:relative;transform:rotate(45deg);background:var(--text);border-radius:3px;overflow:hidden;flex-shrink:0}
+.ruit:after{content:"";position:absolute;left:50%;top:0;width:50%;height:100%;background:var(--bh-orange)}
+.wordmark{font-family:'Poppins',sans-serif;font-weight:700;font-size:22px;letter-spacing:-0.02em}
+.wordmark span{color:var(--bh-orange)}
+.step-label{font-size:15px;color:var(--muted);text-align:right}
+.progress{height:6px;background:var(--line);border-radius:6px;overflow:hidden;margin:0 0 14px}
+.progress>div{height:100%;background:var(--bh-orange);width:0;transition:width .2s ease-out}
+.hero{background:var(--hero);color:var(--hero-text);padding:64px 0 88px;clip-path:polygon(0 0,100% 0,100% calc(100% - 28px),calc(50% + 28px) calc(100% - 28px),50% 100%,calc(50% - 28px) calc(100% - 28px),0 calc(100% - 28px))}
+.hero h1{font-size:clamp(34px,6vw,56px);line-height:1.15;color:#FFFFFF}
+.hero p{color:rgba(255,255,255,.85);max-width:640px;margin:20px 0 0}
+.script{font-family:'Caveat',cursive;font-size:28px;color:var(--bh-orange);line-height:1}
+main{padding:40px 0 96px}
+.card{background:var(--surface);border-radius:16px;box-shadow:var(--shadow);padding:40px;border:1px solid var(--line)}
+@media (max-width:640px){.card{padding:24px}}
+.section-kicker{font-size:15px;font-weight:700;color:var(--bh-orange-dark);margin-bottom:6px}
+:root[data-theme="dark"] .section-kicker{color:var(--bh-orange)}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]) .section-kicker{color:var(--bh-orange)}}
+.card h2{font-size:clamp(26px,4vw,36px);line-height:1.25}
+.intro{color:var(--text-2);margin:12px 0 32px}
+.q{margin:0 0 32px}
+.q label.ql{display:block;font-weight:700;font-size:18px;margin-bottom:6px}
+.hint{font-size:15px;color:var(--muted);margin:-2px 0 10px}
+input[type=text],input[type=email],textarea{width:100%;font:inherit;font-size:17px;color:var(--text);background:var(--surface);border:1px solid var(--line);border-radius:4px;padding:11px 14px;min-height:48px}
+textarea{min-height:120px;resize:vertical;line-height:1.55}
+input:focus,textarea:focus{outline:none;border:2px solid var(--text);padding:10px 13px}
+.err{color:#DC2B00;font-size:15px;margin-top:6px;display:none}
+.q.invalid .err{display:block}
+.q.invalid input,.q.invalid textarea{border-color:#DC2B00}
+.chips{display:flex;flex-wrap:wrap;gap:10px}
+.chip{font:inherit;font-size:17px;padding:10px 20px;min-height:48px;border-radius:33px;border:1px solid var(--text);background:var(--chip);color:var(--text);cursor:pointer;transition:background .2s ease-out,color .2s ease-out}
+.chip[aria-pressed="true"]{background:var(--chip-on);color:var(--chip-on-text);border-color:var(--chip-on);font-weight:700}
+.chip:focus-visible,.btn:focus-visible{outline:2px solid var(--bh-orange);outline-offset:2px}
+.cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:12px}
+.opt{font:inherit;text-align:left;padding:18px;border-radius:16px;border:1px solid var(--line);background:var(--surface);color:var(--text);cursor:pointer;min-height:48px}
+.opt strong{display:block;font-family:'Poppins',sans-serif;font-size:17px}
+.opt span{font-size:15px;color:var(--muted)}
+.opt[aria-pressed="true"]{border:2px solid var(--bh-orange);background:var(--bh-orange-light);padding:17px}
+.axis{margin:0 0 22px}
+.axis-head{display:flex;justify-content:space-between;font-size:15px;color:var(--text-2);font-weight:700}
+.axis-row{display:grid;grid-template-columns:72px 1fr 28px;gap:12px;align-items:center;margin-top:6px;font-size:15px;color:var(--muted)}
+input[type=range]{width:100%;accent-color:var(--bh-orange);height:32px}
+.axis-row.want input[type=range]{accent-color:var(--bh-accent)}
+.nav{display:flex;justify-content:space-between;align-items:center;gap:16px;margin-top:40px;flex-wrap:wrap}
+.btn{font-family:'Poppins',sans-serif;font-weight:700;font-size:16px;height:56px;padding:0 28px;border-radius:4px;border:0;background:var(--btn);color:var(--btn-text);cursor:pointer;display:inline-flex;align-items:center;gap:14px;transition:background .2s ease-out}
+.btn:hover{background:var(--bh-blue-mid)}
+:root[data-theme="dark"] .btn:hover{background:var(--bh-orange-dark)}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]) .btn:hover{background:var(--bh-orange-dark)}}
+.btn.ghost{background:transparent;color:var(--text);border:2px solid var(--text);font-family:'Karla',sans-serif}
+.btn.ghost:hover{background:transparent;text-decoration:underline;text-decoration-thickness:3px}
+.btn[hidden]{display:none}
+.link{color:var(--text);font-weight:700;text-decoration:underline;text-decoration-thickness:3px;text-underline-offset:4px;background:none;border:0;font:inherit;cursor:pointer;padding:0}
+.link:hover{color:var(--bh-orange)}
+.review dt{font-weight:700;margin-top:18px}
+.review dd{margin:4px 0 0;color:var(--text-2);white-space:pre-wrap}
+.timeline{list-style:none;margin:28px 0 0;padding:0;display:grid;gap:0}
+.timeline li{display:grid;grid-template-columns:48px 1fr;gap:16px;padding:0 0 28px;position:relative}
+.timeline li:not(:last-child):before{content:"";position:absolute;left:23px;top:48px;bottom:0;width:2px;background:var(--line)}
+.num{width:48px;height:48px;display:flex;align-items:center;justify-content:center;font-family:'Poppins',sans-serif;font-weight:700;color:#FFFFFF;background:var(--bh-blue);border-radius:6px;transform:rotate(45deg) scale(.78)}
+.num b{transform:rotate(-45deg)}
+.timeline li.done .num{background:var(--bh-orange)}
+.timeline h3{font-size:19px;margin-top:10px}
+.timeline p{margin:4px 0 0;color:var(--text-2);font-size:17px}
+.notice{border-radius:8px;background:var(--bh-orange-light);padding:16px 18px;font-size:16px;color:var(--text);margin-top:24px}
+.copybox{width:100%;min-height:160px;font-family:ui-monospace,monospace;font-size:14px;margin-top:10px}
+.welcome-meta{display:flex;gap:28px;flex-wrap:wrap;margin-top:28px;color:rgba(255,255,255,.85);font-size:16px}
+.welcome-meta b{color:#FFFFFF}
+.sr-only{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0)}
+</style>
+</head>
+<body>
+<header class="top">
+  <div class="wrap">
+    <div class="topbar">
+      <a class="logo" href="#" aria-label="Bikkelhart"><div class="ruit" aria-hidden="true"></div><div class="wordmark">bikkel<span>hart</span></div></a>
+      <div class="step-label" id="stepLabel" aria-live="polite">Welkom</div>
+    </div>
+    <div class="progress" role="progressbar" aria-label="Voortgang" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0"><div id="bar"></div></div>
+  </div>
+</header>
+
+<section class="hero" id="hero">
+  <div class="wrap">
+    <div class="script">Merkscan</div>
+    <h1 id="heroTitle">Vertel ons over je merk. Wij laten zien waar het naartoe kan.</h1>
+    <p id="heroText">Deze vragenlijst is de eerste stap in ons merktraject met <b id="orgName">jullie organisatie</b>. Er zijn geen goede of foute antwoorden: hoe eerlijker, hoe scherper het resultaat.</p>
+    <div class="welcome-meta" id="heroMeta"><div><b>± 15 minuten</b><br>invultijd</div><div><b>7 onderdelen</b><br>tussentijds opgeslagen</div><div><b>Binnen 5 werkdagen</b><br>de eerste richtingen</div></div>
+  </div>
+</section>
+
+<main>
+  <div class="wrap">
+    <div class="card" id="card"></div>
+  </div>
+</main>
+
+<script>
+(function(){
+  var params = new URLSearchParams(location.search);
+  var org = params.get('org');
+  if (org) document.getElementById('orgName').textContent = org;
+
+  var STORE = 'bh-merkscan-concept';
+  var answers = {};
+  try { answers = JSON.parse(localStorage.getItem(STORE) || '{}') || {}; } catch(e) { answers = {}; }
+  function save(){ try { localStorage.setItem(STORE, JSON.stringify(answers)); } catch(e) {} }
+
+  var AXES = [
+    ['klassiek','Klassiek','Vernieuwend'],
+    ['serieus','Serieus','Speels'],
+    ['ingetogen','Ingetogen','Uitgesproken'],
+    ['toegankelijk','Toegankelijk','Exclusief']
+  ];
+
+  var STEPS = [
+    {id:'welkom', title:'Welkom', kicker:'Voordat je begint'},
+    {id:'jij', title:'Over jou', kicker:'Onderdeel 1 van 7', h:'Wie ben je, en waarom nu?', intro:'Zo weten we vanuit welk perspectief je antwoordt. We vragen dit aan meerdere mensen in je organisatie, juist omdat de blikken verschillen.',
+      qs:[
+        {k:'naam',t:'text',l:'Wat is je naam?',req:true,ph:'Sanne de Vries'},
+        {k:'rol',t:'text',l:'Wat is je rol in de organisatie?',req:true,ph:'Directeur, marketeer, oprichter'},
+        {k:'aanleiding',t:'cards',l:'Wat is volgens jou de aanleiding voor dit traject?',req:true,opts:[['Nieuw merk','We beginnen vanaf nul'],['Rebranding','Het huidige merk past niet meer'],['Aanscherping','De basis staat, het verhaal is vaag'],['Fusie of overname','Merken komen samen']]}
+      ]},
+    {id:'verhaal', title:'Het verhaal', kicker:'Onderdeel 2 van 7', h:'Waar komen jullie vandaan?', intro:'Het oprichtingsverhaal bevat vaak de kern van een merk, ook als het toevallig begon.',
+      qs:[
+        {k:'verhaal',t:'area',l:'Wat is het verhaal achter jullie bedrijf? Waarom zijn jullie ooit begonnen?',req:true,ph:'Vertel het zoals je het aan een nieuwe collega zou vertellen'},
+        {k:'verjaardag',t:'area',l:'Hoe leg je op een verjaardag uit wat jullie doen?',hint:'In één of twee zinnen, zonder vakjargon.',req:true,ph:'Wij zorgen ervoor dat...'}
+      ]},
+    {id:'klant', title:'Je klant', kicker:'Onderdeel 3 van 7', h:'Voor wie doen jullie het?', intro:'Denk niet in doelgroepen of leeftijden, maar in situaties: wie heeft jullie op welk moment het hardst nodig?',
+      qs:[
+        {k:'doelgroep',t:'area',l:'Wie heeft jullie het hardst nodig, en op welk moment?',req:true,ph:'Een bestuurder die net budget heeft gekregen en moet laten zien dat het werkt'},
+        {k:'probleem',t:'area',l:'Welk praktisch probleem lossen jullie voor hen op?',req:true,ph:'Projecten lopen uit, kennis ontbreekt, ...'},
+        {k:'gevoel',t:'area',l:'En hoe voelt dat probleem voor hen?',hint:'Frustratie, onzekerheid, druk van bovenaf: wat speelt er onder de oppervlakte?',ph:'Ze worden er persoonlijk op afgerekend'}
+      ]},
+    {id:'onderscheid', title:'Onderscheid', kicker:'Onderdeel 4 van 7', h:'Waarom kiezen klanten voor jullie?', intro:'Beloftes zijn makkelijk, bewijs is schaars. Hoe concreter, hoe beter.',
+      qs:[
+        {k:'bewijs',t:'area',l:'Wat kunnen jullie aantonen dat concurrenten niet kunnen?',hint:'Feiten, jaren ervaring, certificeringen, resultaten, mensen.',req:true,ph:'Wij hebben als enige...'},
+        {k:'concurrenten',t:'area',l:'Wie zie je als belangrijkste concurrenten, en waarom kiezen klanten soms voor hen?',ph:'Bureau X, omdat ze groter zijn'}
+      ]},
+    {id:'karakter', title:'Karakter', kicker:'Onderdeel 5 van 7', h:'Hoe voelt het merk nu, en hoe moet het voelen?', intro:'Zet per lijn twee schuifjes: waar het merk nu staat (oranje) en waar je het wilt hebben (blauw). Het verschil ertussen is waar het traject over gaat.',
+      qs:[{k:'assen',t:'axes'},{k:'ambitie',t:'area',l:'Wat moet er over drie jaar anders zijn aan hoe jullie gezien worden?',ph:'Minder bescheiden, meer de partij die het gesprek in de sector leidt'}]},
+    {id:'grenzen', title:'Grenzen en smaak', kicker:'Onderdeel 6 van 7', h:'Wat past niet bij jullie?', intro:'Een merk wordt minstens zo scherp door wat het níet is.',
+      qs:[
+        {k:'niet',t:'area',l:'Wat is jullie merk nadrukkelijk níet?',req:true,ph:'Nuchter, maar niet saai. Deskundig, maar niet belerend'},
+        {k:'toepassingen',t:'chips',multi:true,l:'Waar moet het merk vooral werken?',opts:['Website','Presentaties','Social media','Print','Verpakking','Signing en locatie','Events']},
+        {k:'referenties',t:'area',l:'Welke merken vind je mooi, en welke juist niet? Vertel er steeds bij waarom.',ph:'Mooi: ..., omdat ze durven te kiezen. Niet: ..., omdat het voelt als stockfoto'}
+      ]},
+    {id:'check', title:'Controleren', kicker:'Onderdeel 7 van 7', h:'Klopt dit zo?', intro:'Loop je antwoorden nog even door. Je kunt terug om iets aan te passen.'},
+    {id:'klaar', title:'Verstuurd', kicker:'Bedankt'}
+  ];
+
+  var cur = 0;
+  var card = document.getElementById('card');
+
+  function esc(s){ return String(s == null ? '' : s).replace(/[&<>"']/g, function(c){ return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]; }); }
+
+  function el(html){ var d = document.createElement('div'); d.innerHTML = html; return d; }
+
+  function renderQ(q){
+    var id = 'q_' + q.k;
+    var v = answers[q.k];
+    var h = '<div class="q" data-k="' + q.k + '">';
+    if (q.t !== 'axes') h += '<label class="ql" for="' + id + '" id="' + id + '_l">' + esc(q.l) + (q.req ? '' : ' <span style="font-weight:400;color:var(--muted)">(optioneel)</span>') + '</label>';
+    if (q.hint) h += '<p class="hint">' + esc(q.hint) + '</p>';
+    if (q.t === 'text') h += '<input type="text" id="' + id + '" value="' + esc(v || '') + '" placeholder="' + esc(q.ph || '') + '">';
+    if (q.t === 'area') h += '<textarea id="' + id + '" placeholder="' + esc(q.ph || '') + '">' + esc(v || '') + '</textarea>';
+    if (q.t === 'cards') {
+      h += '<div class="cards" role="group" aria-labelledby="' + id + '_l">';
+      q.opts.forEach(function(o){ h += '<button type="button" class="opt" data-v="' + esc(o[0]) + '" aria-pressed="' + (v === o[0]) + '"><strong>' + esc(o[0]) + '</strong><span>' + esc(o[1]) + '</span></button>'; });
+      h += '</div>';
+    }
+    if (q.t === 'chips') {
+      var arr = v || [];
+      h += '<div class="chips" role="group" aria-labelledby="' + id + '_l">';
+      q.opts.forEach(function(o){ h += '<button type="button" class="chip" data-v="' + esc(o) + '" aria-pressed="' + (arr.indexOf(o) > -1) + '">' + esc(o) + '</button>'; });
+      h += '</div>';
+    }
+    if (q.t === 'axes') {
+      var a = answers.assen || {};
+      AXES.forEach(function(ax){
+        var nu = (a[ax[0]] && a[ax[0]].nu) || 5, wil = (a[ax[0]] && a[ax[0]].wil) || 5;
+        h += '<div class="axis"><div class="axis-head"><span>' + ax[1] + '</span><span>' + ax[2] + '</span></div>' +
+          '<div class="axis-row"><label for="' + ax[0] + '_nu">Nu</label><input type="range" min="1" max="10" step="1" id="' + ax[0] + '_nu" data-ax="' + ax[0] + '" data-w="nu" value="' + nu + '"><output>' + nu + '</output></div>' +
+          '<div class="axis-row want"><label for="' + ax[0] + '_wil">Gewenst</label><input type="range" min="1" max="10" step="1" id="' + ax[0] + '_wil" data-ax="' + ax[0] + '" data-w="wil" value="' + wil + '"><output>' + wil + '</output></div></div>';
+      });
+    }
+    h += '<div class="err">Vul dit even in voordat je verdergaat.</div></div>';
+    return h;
+  }
+
+  function wire(){
+    card.querySelectorAll('.q').forEach(function(qd){
+      var k = qd.getAttribute('data-k');
+      qd.querySelectorAll('input[type=text],textarea').forEach(function(inp){
+        inp.addEventListener('input', function(){ answers[k] = inp.value; qd.classList.remove('invalid'); save(); });
+      });
+      qd.querySelectorAll('.opt').forEach(function(b){
+        b.addEventListener('click', function(){
+          answers[k] = b.getAttribute('data-v');
+          qd.querySelectorAll('.opt').forEach(function(x){ x.setAttribute('aria-pressed', String(x === b)); });
+          qd.classList.remove('invalid'); save();
+        });
+      });
+      qd.querySelectorAll('.chip').forEach(function(b){
+        b.addEventListener('click', function(){
+          var arr = answers[k] || []; var val = b.getAttribute('data-v'); var i = arr.indexOf(val);
+          if (i > -1) arr.splice(i, 1); else arr.push(val);
+          answers[k] = arr; b.setAttribute('aria-pressed', String(i === -1)); save();
+        });
+      });
+      qd.querySelectorAll('input[type=range]').forEach(function(r){
+        r.addEventListener('input', function(){
+          var a = answers.assen || {}; var ax = r.getAttribute('data-ax');
+          a[ax] = a[ax] || {nu:5, wil:5}; a[ax][r.getAttribute('data-w')] = Math.round(Number(r.value));
+          answers.assen = a; r.nextElementSibling.textContent = Math.round(Number(r.value)); save();
+        });
+      });
+    });
+  }
+
+  function validate(){
+    var ok = true, first = null;
+    (STEPS[cur].qs || []).forEach(function(q){
+      if (!q.req) return;
+      var v = answers[q.k];
+      var filled = Array.isArray(v) ? v.length > 0 : (v != null && String(v).trim() !== '');
+      if (!filled) { ok = false; var qd = card.querySelector('.q[data-k="' + q.k + '"]'); qd.classList.add('invalid'); if (!first) first = qd; }
+    });
+    if (first) { var f = first.querySelector('input,textarea,button'); if (f) f.focus(); }
+    return ok;
+  }
+
+  function summaryText(){
+    var lines = ['Bikkelhart merkscan, antwoorden' + (org ? ' (' + org + ')' : '')];
+    STEPS.forEach(function(s){
+      (s.qs || []).forEach(function(q){
+        if (q.t === 'axes') {
+          var a = answers.assen || {};
+          AXES.forEach(function(ax){ var x = a[ax[0]] || {nu:5, wil:5}; lines.push(ax[1] + ' / ' + ax[2] + ': nu ' + x.nu + ', gewenst ' + x.wil); });
+        } else {
+          var v = answers[q.k]; if (Array.isArray(v)) v = v.join(', ');
+          lines.push(q.l + '\n' + (v && String(v).trim() ? v : '(niet ingevuld)'));
+        }
+      });
+    });
+    return lines.join('\n\n');
+  }
+
+  function setProgress(){
+    var pct = Math.round(cur / (STEPS.length - 1) * 100);
+    document.getElementById('bar').style.width = pct + '%';
+    document.querySelector('.progress').setAttribute('aria-valuenow', pct);
+    document.getElementById('stepLabel').textContent = cur === 0 ? 'Welkom' : (cur >= STEPS.length - 1 ? 'Afgerond' : STEPS[cur].kicker + ' · ' + pct + '%');
+    document.getElementById('hero').style.display = cur === 0 ? '' : 'none';
+  }
+
+  function nextSteps(doneUpTo){
+    var items = [
+      ['Jij vult de merkscan in','En wij vragen hetzelfde aan een paar collega\u2019s van je, zodat we verschillende blikken naast elkaar zien.'],
+      ['Wij lezen en vergelijken','Een strateeg van Bikkelhart legt de antwoorden naast elkaar en zoekt naar de spanningen: daar zit het echte merkgesprek.'],
+      ['Eerste strategie-draft','Een voorstel voor merkbelofte, positionering en merkwaarden, inclusief de vragen die nog open liggen.'],
+      ['Drie speed runs','Drie contrasterende visuele richtingen op één pagina per richting. Bewust uitgesproken, zodat je kunt kiezen en terugschalen.'],
+      ['Samen kiezen','In een sessie van anderhalf uur bespreken we de richtingen en bepalen we welke we verder uitwerken.']
+    ];
+    var h = '<ol class="timeline">';
+    items.forEach(function(it, i){ h += '<li class="' + (i < doneUpTo ? 'done' : '') + '"><div class="num" aria-hidden="true"><b>' + (i + 1) + '</b></div><div><h3>' + it[0] + '</h3><p>' + it[1] + '</p></div></li>'; });
+    return h + '</ol>';
+  }
+
+  function render(){
+    var s = STEPS[cur]; var h = '';
+    if (s.id === 'welkom') {
+      h += '<div class="section-kicker">' + s.kicker + '</div><h2>Zo werkt het</h2>' +
+        '<p class="intro">We stellen je vragen over het verhaal, je klanten, jullie onderscheid en het karakter van het merk. Je antwoorden blijven tussentijds bewaard op dit apparaat, dus je kunt pauzeren en later verder.</p>' +
+        nextSteps(0) +
+        '<div class="notice">Dit is een interne testversie. Antwoorden worden alleen gedeeld met het Bikkelhart-team dat aan dit traject werkt.</div>' +
+        '<div class="nav"><span></span><button type="button" class="btn" id="next">Start de merkscan <span aria-hidden="true">\u2192</span></button></div>';
+    } else if (s.id === 'check') {
+      h += '<div class="section-kicker">' + s.kicker + '</div><h2>' + s.h + '</h2><p class="intro">' + s.intro + '</p><dl class="review">';
+      STEPS.forEach(function(st){
+        (st.qs || []).forEach(function(q){
+          if (q.t === 'axes') {
+            var a = answers.assen || {};
+            h += '<dt>Karakter (nu \u2192 gewenst)</dt><dd>' + AXES.map(function(ax){ var x = a[ax[0]] || {nu:5, wil:5}; return esc(ax[1] + ' / ' + ax[2] + ': ' + x.nu + ' \u2192 ' + x.wil); }).join('\n') + '</dd>';
+          } else {
+            var v = answers[q.k]; if (Array.isArray(v)) v = v.join(', ');
+            h += '<dt>' + esc(q.l) + '</dt><dd>' + (v && String(v).trim() ? esc(v) : '<em>Niet ingevuld</em>') + '</dd>';
+          }
+        });
+      });
+      h += '</dl><div class="nav"><button type="button" class="btn ghost" id="prev">Terug</button><button type="button" class="btn" id="send">Verstuur je antwoorden <span aria-hidden="true">\u2192</span></button></div><p class="err" id="sendErr" role="alert"></p>';
+    } else if (s.id === 'klaar') {
+      h += '<div class="script">Top, dankjewel!</div><h2 style="margin-top:8px">Je antwoorden zijn binnen</h2>' +
+        '<p class="intro">Dit gebeurt er nu. We houden je op de hoogte bij elke stap.</p>' + nextSteps(1) +
+        '<div id="saveNote" class="notice" role="status">Je antwoorden worden opgeslagen...</div>' +
+        '<details style="margin-top:24px"><summary class="link">Bekijk of kopieer je antwoorden</summary><textarea class="copybox" readonly aria-label="Je antwoorden als tekst">' + esc(summaryText()) + '</textarea></details>' +
+        '<div class="nav"><button type="button" class="btn ghost" id="restart">Opnieuw invullen</button></div>';
+    } else {
+      h += '<div class="section-kicker">' + s.kicker + '</div><h2>' + esc(s.h) + '</h2><p class="intro">' + esc(s.intro) + '</p>';
+      s.qs.forEach(function(q){ h += renderQ(q); });
+      h += '<div class="nav"><button type="button" class="btn ghost" id="prev">Terug</button><button type="button" class="btn" id="next">Volgende <span aria-hidden="true">\u2192</span></button></div>';
+    }
+    card.innerHTML = h;
+    setProgress(); wire();
+    var n = document.getElementById('next'), p = document.getElementById('prev'), sd = document.getElementById('send'), rs = document.getElementById('restart');
+    if (n) n.addEventListener('click', function(){ if (validate()) go(cur + 1); });
+    if (p) p.addEventListener('click', function(){ go(cur - 1); });
+    if (sd) sd.addEventListener('click', submit);
+    if (rs) rs.addEventListener('click', function(){ answers = {}; save(); go(0); });
+  }
+
+  function go(i){ cur = Math.max(0, Math.min(STEPS.length - 1, i)); render(); window.scrollTo(0, 0); var h2 = card.querySelector('h2'); if (h2) { h2.setAttribute('tabindex', '-1'); h2.focus({preventScroll:true}); } }
+
+  function submit(){
+    go(STEPS.length - 1);
+    var note = document.getElementById('saveNote');
+    var payload = { org: org || '', answers: answers, submittedAt: new Date().toISOString(), version: 'test-1' };
+    var done = false;
+    function fallback(){ if (done) return; done = true; note.textContent = 'Je antwoorden staan klaar, maar konden in deze testomgeving niet centraal worden opgeslagen. Kopieer ze hieronder en stuur ze naar je Bikkelhart-contactpersoon.'; }
+    var timer = setTimeout(fallback, 12000);
+    try {
+      if (!window.claude || !window.claude.use) { clearTimeout(timer); fallback(); return; }
+      window.claude.use('db').then(function(db){
+        if (!db) { clearTimeout(timer); fallback(); return; }
+        return db.collection('responses').add(payload).then(function(){
+          clearTimeout(timer); if (done) return; done = true;
+          note.textContent = 'Je antwoorden zijn opgeslagen bij het Bikkelhart-team.';
+        });
+      }).catch(function(){ clearTimeout(timer); fallback(); });
+    } catch(e) { clearTimeout(timer); fallback(); }
+  }
+
+  render();
+})();
+</script>
+</body>
+</html>
