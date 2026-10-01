@@ -100,6 +100,7 @@ input[type=range]{width:100%;accent-color:var(--bh-orange);height:32px}
 .copybox{width:100%;min-height:160px;font-family:ui-monospace,monospace;font-size:14px;margin-top:10px}
 .welcome-meta{display:flex;gap:28px;flex-wrap:wrap;margin-top:28px;color:rgba(255,255,255,.85);font-size:16px}
 .welcome-meta b{color:#FFFFFF}
+.client-logo{display:block;max-height:48px;max-width:200px;margin:0 0 20px;background:#FFFFFF;padding:8px 12px;border-radius:6px}
 .sr-only{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0)}
 </style>
 </head>
@@ -132,10 +133,11 @@ input[type=range]{width:100%;accent-color:var(--bh-orange);height:32px}
 <script>
 (function(){
   var params = new URLSearchParams(location.search);
+  var klant = (params.get('klant') || '').replace(/[^a-zA-Z0-9_-]/g, '').slice(0, 40);
   var org = params.get('org');
   if (org) document.getElementById('orgName').textContent = org;
 
-  var STORE = 'bh-merkscan-concept';
+  var STORE = 'bh-merkscan-concept' + (klant ? '-' + klant : '');
   var answers = {};
   try { answers = JSON.parse(localStorage.getItem(STORE) || '{}') || {}; } catch(e) { answers = {}; }
   function save(){ try { localStorage.setItem(STORE, JSON.stringify(answers)); } catch(e) {} }
@@ -351,7 +353,7 @@ input[type=range]{width:100%;accent-color:var(--bh-orange);height:32px}
   function submit(){
     go(STEPS.length - 1);
     var note = document.getElementById('saveNote');
-    var payload = { org: org || '', answers: answers, submitted_at: new Date().toISOString(), version: 'test-1' };
+    var payload = { org: org || '', client_code: klant || null, answers: answers, submitted_at: new Date().toISOString(), version: 'test-1' };
     function fallback(){ note.textContent = 'Je antwoorden konden niet worden opgeslagen. Kopieer ze hieronder en stuur ze naar je Bikkelhart-contactpersoon.'; }
     try {
       fetch(SUPABASE_URL + '/rest/v1/responses', {
@@ -365,7 +367,40 @@ input[type=range]{width:100%;accent-color:var(--bh-orange);height:32px}
     } catch(e) { fallback(); }
   }
 
-  render();
+  function applyClient(c){
+    if (!c || !c.naam) return;
+    org = c.naam;
+    var on = document.getElementById('orgName'); if (on) on.textContent = c.naam;
+    if (c.intro) document.getElementById('heroText').textContent = c.intro;
+    if (c.kleur && /^#[0-9a-fA-F]{6}$/.test(c.kleur)) document.getElementById('hero').style.boxShadow = 'inset 0 8px 0 ' + c.kleur;
+    if (c.logo_url && /^https:\/\//.test(c.logo_url)) {
+      var img = document.createElement('img');
+      img.src = c.logo_url; img.alt = c.naam; img.className = 'client-logo';
+      var w = document.querySelector('#hero .wrap'); w.insertBefore(img, w.firstChild);
+    }
+    if (c.extra_vraag) {
+      for (var i = 0; i < STEPS.length; i++) {
+        if (STEPS[i].id === 'grenzen') { STEPS[i].qs.push({k:'extra', t:'area', l:c.extra_vraag}); break; }
+      }
+    }
+  }
+
+  if (klant) {
+    var started = false;
+    var start = function(c){ if (started) return; started = true; try { applyClient(c); } catch(e) {} render(); };
+    setTimeout(function(){ start(null); }, 4000);
+    try {
+      fetch(SUPABASE_URL + '/rest/v1/rpc/get_client', {
+        method: 'POST',
+        headers: { 'apikey': SUPABASE_KEY, 'Content-Type': 'application/json' },
+        body: JSON.stringify({ p_code: klant })
+      }).then(function(r){ return r.ok ? r.json() : null; })
+        .then(function(rows){ start(Array.isArray(rows) ? rows[0] : rows); })
+        .catch(function(){ start(null); });
+    } catch(e) { start(null); }
+  } else {
+    render();
+  }
 })();
 </script>
 </body>
